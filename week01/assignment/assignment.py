@@ -171,6 +171,19 @@ def run_with_threads(tur, log, main_turtle):
     # TODO - Start add your code here.
     # You need to use 4 threads where each thread concurrently drawing one type of shape.
     # You are free to change any functions in this code except main()
+    t1  = threading.Thread(target= draw_squares ,args=(tur,))
+    t2 = threading.Thread(target= draw_circles,args=(tur,))
+    t3 = threading.Thread(target= draw_triangles,args=(tur,))
+    t4 = threading.Thread(target= draw_rectangles,args=(tur,))
+
+    t1.start()
+    t1.join()
+    t2.start()
+    t2.join()
+    t3.start()
+    t3.join()
+    t4.start()
+    t4.join()
 
     log.step_timer('All drawing commands have been created')
 

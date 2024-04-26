@@ -26,6 +26,7 @@ numbers_processed = 0
 def is_prime(n):
     global numbers_processed
     numbers_processed += 1
+    
 
     """Primality test using 6k+-1 optimization.
     From: https://en.wikipedia.org/wiki/Primality_test
@@ -41,6 +42,19 @@ def is_prime(n):
         i += 6
     return True
 
+def thread_count():
+    start = 10000000000
+    range_count = 100000
+    
+    for i in range(start, start + range_count):
+
+        if is_prime(i):
+            global prime_count
+            prime_count += 1
+            print(i, end=', ', flush=True)
+        print(flush=True)
+
+
 
 if __name__ == '__main__':
     log = Log(show_terminal=True)
@@ -50,14 +64,10 @@ if __name__ == '__main__':
     # TODO 2) move the following for loop into 1 thread
     # TODO 3) change the program to divide the for loop into 10 threads
 
-    start = 10000000000
-    range_count = 100000
-    for i in range(start, start + range_count):
-        if is_prime(i):
-            prime_count += 1
-            print(i, end=', ', flush=True)
-    print(flush=True)
-
+    
+    t1 = threading.Thread(target=thread_count)
+    t1.start
+    t1.join
     # Should find 4306 primes
     log.write(f'Numbers processed = {numbers_processed}')
     log.write(f'Primes found      = {prime_count}')
