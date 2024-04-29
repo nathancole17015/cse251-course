@@ -49,7 +49,7 @@ def thread_count():
     for i in range(start, start + range_count):
 
         if is_prime(i):
-            global prime_count
+            
             prime_count += 1
             print(i, end=', ', flush=True)
         print(flush=True)

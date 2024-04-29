@@ -398,7 +398,7 @@ In the table above, Thread `B` will crash when trying to open the file in write 
 Python allows you to denote part of your code as a critical section.  A critical section is code that only allows 1 thread to execute at a time.  That thread will start and finish executing the code before any other thread can execute it.  [Critical Section webpage](https://en.wikipedia.org/wiki/Critical_section)
 
 
-In the figure, 4 threads are tyring to get into the critical section.
+In the figure, 4 threads are trying to get into the critical section.
 
 ![](synchronizing.jpg)
 
