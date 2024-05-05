@@ -180,6 +180,7 @@ def run_with_threads(tur, log, main_turtle):
                 lock.acquire()
                 draw_square(tur, x - 50, y + 50, 100)
                 lock.release()
+                time.sleep(0)
                 
     def draw_circles_thread(tur):
         for x in range(-300, 350, 200):
@@ -187,6 +188,8 @@ def run_with_threads(tur, log, main_turtle):
                 lock.acquire()
                 draw_circle(tur, x, y-2, 50)
                 lock.release()
+                time.sleep(0)
+
         
     def draw_triangles_thread(tur):
         for x in range(-300, 350, 200):
@@ -194,6 +197,8 @@ def run_with_threads(tur, log, main_turtle):
                 lock.acquire()
                 draw_triangle(tur, x-30, y-30+10, 60)
                 lock.release()
+                time.sleep(0)
+
 
         
     def draw_rectangles_thread(tur):
@@ -202,6 +207,8 @@ def run_with_threads(tur, log, main_turtle):
                 lock.acquire()
                 draw_rectangle(tur, x-10, y+5, 20, 15)
                 lock.release()
+                time.sleep(0)
+
         
 
 
