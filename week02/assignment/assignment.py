@@ -40,7 +40,6 @@ this dictionary to make other API calls for data.
 
 from datetime import datetime, timedelta
 import requests
-import json
 import threading
 
 # Include cse 251 common Python files
@@ -52,33 +51,29 @@ TOP_API_URL = 'http://127.0.0.1:8790'
 # Global Variables
 call_count = 0
 
+# Threaded class definition
+class RequestThread(threading.Thread):
+    def __init__(self, url):
+        threading.Thread.__init__(self)
+        self.url = url
+        self.response = {}
 
-# TODO Add your threaded class definition here
-class request_thread(threading.Thread):
-  
-  def __init__(self,url):
-    threading.Thread.__init__(self)
-    self.url = url
-    self.response = {}
+    def run(self):
+        global call_count
+        response = requests.get(self.url)
+        call_count += 1
+        if response.status_code == 200:
+            self.response = response.json()
+        else:
+            print("Response = ", response.status_code)
 
-  def run(self):
-    response  = requests.get(self.url)
-    if response.status_code == 200:
-       self.response = response.json()
-    else:
-       print("Response = ", response.status_code)   
-
-
-
-# TODO Add any functions you need here
-
+# Retrieve top URLs
 def retrieve_top_urls():
     top_response = requests.get(TOP_API_URL)
     if top_response.status_code == 200:
         return top_response.json()
 
-
-# Function to retrieve details of film 6
+# Retrieve details of film
 def retrieve_film_details(film_url):
     film_response = requests.get(film_url)
     if film_response.status_code == 200:
@@ -86,76 +81,94 @@ def retrieve_film_details(film_url):
     else:
         print("Failed to retrieve film details")
         return None
-    
+
 def main():
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
 
-    # Retrieve Top API urls
     top_urls = retrieve_top_urls()
     if top_urls:
-        # Extract film URL
         film_url = top_urls.get("films")
-        # Retrieve film details
-        film_thread = request_thread(film_url + "6/")
+        film_thread = RequestThread(film_url + "6/")
         film_thread.start()
         film_thread.join()
         film_details = film_thread.response
         if film_details:
-            # Display film details
+            print()
             print("Film 6 Details:")
             print("Title:", film_details.get("title"))
             print("Director:", film_details.get("director"))
             print("Producer:", film_details.get("producer"))
             print()
-            print("Characters:")
+
             people_list = film_details.get("characters", [])
+            print()
+            print("Number of Characters:", len(people_list))
+            print("Characters:")
+            threads = []
             for person_url in people_list:
-                person_thread = request_thread(person_url)
+                person_thread = RequestThread(person_url)
+                threads.append(person_thread)
                 person_thread.start()
-                person_thread.join()
-                person_details = person_thread.response
+            for thread in threads:
+                thread.join()
+                person_details = thread.response
                 if person_details:
-                    print("-", person_details.get("name", "N/A"))
-                    
+                    print(person_details.get("name"), end=', ')
             print()
-            print("Planets:")
+
             planets_list = film_details.get("planets", [])
+            print()
+            print("Number of Planets:", len(planets_list))
+            print("Planets:")
+            threads = []
             for planets_url in planets_list:
-                planets_thread = request_thread(planets_url)
+                planets_thread = RequestThread(planets_url)
+                threads.append(planets_thread)
                 planets_thread.start()
-                planets_thread.join()
-                planets_details = planets_thread.response
+            for thread in threads:
+                thread.join()
+                planets_details = thread.response
                 if planets_details:
-                    print("-", planets_details.get("name", "N/A"))
-            
+                    print(planets_details.get("name"), end=', ')
             print()
 
-            print("Starships:")
             starships_list = film_details.get("starships", [])
+            print()
+            print("Number of Starships:", len(starships_list))
+            print("Starships:")
+            threads = []
             for starship_url in starships_list:
-                starship_thread = request_thread(starship_url)
+                starship_thread = RequestThread(starship_url)
+                threads.append(starship_thread)
                 starship_thread.start()
-                starship_thread.join()
-                starship_details = starship_thread.response
+            for thread in threads:
+                thread.join()
+                starship_details = thread.response
                 if starship_details:
-                    print("-", starship_details.get("name", "N/A"))
-
+                    print(starship_details.get("name"), end=', ')
             print()
 
-            print("Species:")
+            # Retrieve details of species
             species_list = film_details.get("species", [])
-            for species_url in species_list:
-                species_thread = request_thread(species_url)
-                species_thread.start()
-                species_thread.join()
-                species_details = species_thread.response
-                if species_details:
-                    species_list.append( species_details.get("name"))
             print()
-
+            print("Number of Species:", len(species_list))
+            print("Species:")
+            threads = []
+            for species_url in species_list:
+                species_thread = RequestThread(species_url)
+                threads.append(species_thread)
+                species_thread.start()
+            for thread in threads:
+                thread.join()
+                species_details = thread.response
+                if species_details:
+                    print(species_details.get("name"), end=', ')
+            print()
+    print()
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
+    print()
 
 if __name__ == "__main__":
     main()
