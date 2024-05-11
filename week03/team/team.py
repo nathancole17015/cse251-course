@@ -122,7 +122,9 @@ class Board():
     def _word_at_this_location(self, row, col, direction, word):
         """ Helper function: is the word found on the board at (x, y) in a direction """
         dir_x, dir_y = self.directions[direction]
-        highlight_copy = copy.deepcopy(self.highlighting)
+        # highlight_copy = copy.deepcopy(self.highlighting)
+        start_row = row
+        start_col = col
         for letter in word:
             board_letter = self.get_letter(row, col)
             if board_letter == letter:
@@ -130,8 +132,17 @@ class Board():
                 row += dir_x
                 col += dir_y
             else:
-                self.highlighting = copy.deepcopy(highlight_copy)
+                # self.highlighting = copy.deepcopy(highlight_copy)
+        
                 return False
+        row = start_row
+        col = start_col
+        for _ in range(len(word)):
+            self.highlight(row, col)
+            row += dir_x
+            col += dir_y
+
+        
         return True
 
     def find_word(self, word):
@@ -139,15 +150,24 @@ class Board():
         print(f'Finding {word}...')
         for row in range(self.size):
             for col in range(self.size):
-                for d in range(0, 8):
-                    if self._word_at_this_location(row, col, d, word):
-                        return True
+                if self.board[row][col] == word[0]:
+                    for d in range(0, 8):
+                        if self._word_at_this_location(row, col, d, word):
+                            return True
         return False
 
+    def highlight_at_location(self, row, col , dir, size):
+        dir_x, dir_y = self.directions(row)
 
 def main():
     board = Board()
     board.display()
+    pool = mp.Pool(2)
+    pool.map(board.find_word, words)
+    results  = pool.map(board.find_word, words)
+    for result in results:
+        if result is not None:
+            board.highlight
 
     start = time.perf_counter()
     for word in words:

@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # single_file_processing(300)
     # print('cpu_count() =', cpu_count())
 
-    all_process_time = timeit.default_timer()
+    call_process_time = timeit.default_timer()
     log = Log(show_terminal=True)
 
     xaxis_cpus = []
