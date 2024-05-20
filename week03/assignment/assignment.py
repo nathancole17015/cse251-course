@@ -42,7 +42,7 @@ def create_new_frame(image_file, green_file, process_file):
     """ Creates a new image file from image_file and green_file """
 
     # this print() statement is there to help see which frame is being processed
-    print(f'{process_file[-7:-4]}', end=',', flush=True)
+    # print(f'{process_file[-7:-4]}', end=',', flush=True)
 
     image_img = Image.open(image_file)
     green_img = Image.open(green_file)
@@ -61,8 +61,14 @@ def create_new_frame(image_file, green_file, process_file):
 
 
 # TODO add any functions to need here
+def use_frames(image_number):
+    image_file = rf'elephant/image{image_number:03d}.png'
+    green_file = rf'green/image{image_number:03d}.png'
+    process_file = rf'processed/image{image_number:03d}.png'
 
-
+    
+    create_new_frame(image_file, green_file, process_file)
+    
 
 if __name__ == '__main__':
     # single_file_processing(300)
@@ -76,23 +82,32 @@ if __name__ == '__main__':
 
     # TODO Process all frames trying 1 cpu, then 2, then 3, ... to CPU_COUNT
     #      add results to xaxis_cpus and yaxis_times
+    frames = list(range(1,FRAME_COUNT + 1))
 
+    for i in range(1,CPU_COUNT + 1 ):
+        with mp.Pool(i) as p:
+            start_time = timeit.default_timer()
+            p.map(use_frames, frames)
+            end_time = timeit.default_timer()- start_time
+            log.write(f"Time for {FRAME_COUNT} frames using {i} processes: {end_time}")
+            xaxis_cpus.append(i)
+            yaxis_times.append(end_time)
 
     # sample code: remove before submitting  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # process one frame #10
-    image_number = 10
+    # image_number = 10
 
-    image_file = rf'elephant/image{image_number:03d}.png'
-    green_file = rf'green/image{image_number:03d}.png'
-    process_file = rf'processed/image{image_number:03d}.png'
+    # image_file = rf'elephant/image{image_number:03d}.png'
+    # green_file = rf'green/image{image_number:03d}.png'
+    # process_file = rf'processed/image{image_number:03d}.png'
 
-    start_time = timeit.default_timer()
-    create_new_frame(image_file, green_file, process_file)
-    print(f'\nTime To Process all images = {timeit.default_timer() - start_time}')
+    # start_time = timeit.default_timer()
+    # create_new_frame(image_file, green_file, process_file)
+    # print(f'\nTime To Process all images = {timeit.default_timer() - start_time}')
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
-    log.write(f'Total Time for ALL processing: {timeit.default_timer() - all_process_time}')
+    log.write(f'Total Time for ALL processing: {timeit.default_timer() - call_process_time}')
 
     # create plot of results and also save it to a PNG file
     plt.plot(xaxis_cpus, yaxis_times, label=f'{FRAME_COUNT}')
